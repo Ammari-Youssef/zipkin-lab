@@ -1,0 +1,38 @@
+services:
+  zipkin:
+    image: openzipkin/zipkin:latest
+    container_name: zipkin
+    ports:
+      - "9411:9411"
+    networks:
+      - zipkin-lab
+
+  serviceA:
+    build: ./serviceA
+    container_name: serviceA
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_ZIPKIN_BASE_URL=http://zipkin:9411
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - zipkin
+    networks:
+      - zipkin-lab
+
+  serviceB:
+    build: ./serviceB
+    container_name: serviceB
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_ZIPKIN_BASE_URL=http://zipkin:9411
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - zipkin
+    networks:
+      - zipkin-lab
+
+networks:
+  zipkin-lab:
+    name: zipkin-lab
